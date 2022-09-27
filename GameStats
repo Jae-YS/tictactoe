@@ -1,0 +1,25 @@
+public class GameStats{
+	final int nlosses;
+	final int total;
+	final int nwins;
+	final int nties;
+	final double percent;
+
+	GameStats(){}
+	void recordLoss(){
+		this.nlosses++;
+		this.total++;
+		this.percent = (double)this.wins/(double)this.total;
+	}
+	void recordTie(){
+		nties++;
+		total++;
+	}
+	void recordWin(){
+		nwins++
+		total++;
+	}
+
+	public String toString(){
+		return String.format("Thanks for playing!\r\n Overall record: %
+	}
