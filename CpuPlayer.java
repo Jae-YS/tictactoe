@@ -6,21 +6,17 @@ public class CpuPlayer extends APlayer{
     }
 
     public Move pickMove(){
-        return new Move(1,1); 
-    }
-    /*public Move pickMove(){
-        int row = (Math.random() * game.boardSize);
-        int col = (Math.random() * game.boardSize); 
-        Move nextMove = new Move(row,col)
+        int row = (int)(Math.random() * game.boardSize);
+        int col = (int)(Math.random() * game.boardSize); 
+        Move nextMove = new Move(row,col);
         while(!game.isValidMove(nextMove)){
-            row = (Math.random() * 3);
-            col = (Math.random() * 3); 
+            row = (int)(Math.random() * 3);
+            col = (int)(Math.random() * 3); 
             
         } 
-        row+=65;
+        char represent = (char) (row+=65);
 
-        System.out.println("The CPU's next move is" +row+col);
+        System.out.println("The CPU's next move is " +represent+col);
         return nextMove; 
     }
-    */
 }

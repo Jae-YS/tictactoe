@@ -6,8 +6,8 @@ public class Game{
     char[][] board;
     APlayer[] players = new APlayer[2];
     private char SYMBOL_BLANK = ' ';
-    private char SYMBOL_CPU = 'O';
-    private char SYMBOL_HUMAN = 'X';
+    private char SYMBOL_1 = 'O';
+    private char SYMBOL_2 = 'X';
 
     Game(){
         this.board = new char[3][3];
@@ -32,14 +32,37 @@ public class Game{
 	    this.board[move.row][move.col] = symbol;
     }
 
-    public void getGameStatus(){
-    
+    public char getGameStatus(){
+        /*
+         * return 'O' if you can still play the game
+         * return '1' if player 1 won
+         * return '2' if player 2 won
+         * return 'T' if the game is a tie
+         * return 'Q' if user quits the game; 
+         */
+        
+        //check vertical
+        for(int i=0;i<board.length;i++){
+            for(int y=0;y<board[i].length;y++){
+
+            }
+        }
+        
+
+        //check horizontal
+
+        //check diagonal
+
+        return '0';
     }
 
+    /*
+     * Resets the game board by replacing all 'X' and 'O' to ' '
+     */
     protected void resetGame(){
         for(int i=0;i<this.board.length;i++){
             for(int y=0;y<this.board[i].length;y++){
-		board[i][y] = this.SYMBOL_BLANK; 
+		        board[i][y] = this.SYMBOL_BLANK; 
             } 
         }
     }
@@ -77,46 +100,90 @@ public class Game{
         return s += "\r\n";
     }
 
+    public char playGame(APlayer[] players){
+        int whoPlays = 0;
+        char keepPlaying = ' '; 
+        while(true){
+            if(whoPlays == 2) whoPlays = 0;
+            System.out.println(toString());
+            Move nextMove = players[whoPlays].pickMove();
+            if(nextMove == null) return 'Q';
+            executeMove(nextMove, players[whoPlays].symbol);
+	        keepPlaying = this.getGameStatus(); 
+            if(keepPlaying != '0') break;
+            whoPlays++; 
+        }
+        return keepPlaying;
+    }
     public static void main(String args[]){
         Scanner sc  = new Scanner(System.in);
 
         //beginning the game
-        System.out.println("Enter 'S' to begin");
+        System.out.println("Welcome to TicTacToe! \nEnter S to begin");
         String start = sc.nextLine();
         while(!start.equalsIgnoreCase("s")){
             System.out.println("Try again. Enter 'S' to begin");
             start = sc.nextLine();
         }
-        boolean runGame = true;
+        System.out.println("One Player (1) or Two Player (2)?\nEnter a number");
+        int option = sc.nextInt();
+        while(option != 1 && option != 2){
+            System.out.println("Try again. Enter a number 1 or 2"); 
+            option = sc.nextInt();
+        }
 
         //determining who goes first
-        System.out.println("Randomly choosing");
+        System.out.println("\nRandomly choosing who goes first...");
         Game gameboard = new Game();
-        System.out.println(gameboard.toString()); 
-        /*Player p1 = new HumanPlayer();
-        Player p2 = new CpuPlayer();
-        int whoFirst = (Math.random() * 1);
+        APlayer p1;
+        APlayer p2;
+        GameStats stats;
+        if(option == 1 ){
+            p1 = new HumanPlayer(gameboard, gameboard.SYMBOL_1);
+            p2 = new CpuPlayer(gameboard, gameboard.SYMBOL_2);
+            stats = new GameStats(p1);
+        }
+        else{
+            p1 = new HumanPlayer(gameboard, gameboard.SYMBOL_1);
+            p2 = new HumanPlayer(gameboard, gameboard.SYMBOL_2);
+            stats = new GameStats(p1, p2);
+        }
+        int whoFirst = (int)(Math.random() * 1);
         if(whoFirst == 0){
-            players[0] = p1;
-            players[1] = p2;
+            gameboard.players[0] = p1;
+            gameboard.players[1] = p2;
 
         }
         else{
-            players[0] = p2;
-            players[1] = p1;
+            gameboard.players[0] = p2;
+            gameboard.players[1] = p1;
         }
-        
-        int whoplays = 0;
+    
+        boolean game = true; 
         //running the game
-        while(runGame){
-	    System.out.println(this.gameboard);
-            System.out.println(players[whoplays]);
-            Move nextMove = players[whoplays].pickMove;
-	    break; 
-        */
-             
-    }
+        while(game){
+            char result = gameboard.playGame(gameboard.players);
+            switch(result){
+                case '1':
+                    if(gameboard.players[0] instanceof HumanPlayer && gameboard.players[1] instanceof HumanPlayer) stats.p1recordWin();
+                    //check to see if this works? else I need to have two separate methods to see if they are  p1 vs p2 or p1 vs cpu
+                    else stats.p1recordWin();
+                    break;
+                case '2':
+                    if(gameboard.players[0] instanceof HumanPlayer && gameboard.players[1] instanceof HumanPlayer) stats.p1recordLoss();
+                    else stats.p1recordLoss();
+                    break;
+                case 'T':
+                    stats.recordTie();
+                    break;
+                default: 
+                    game = false;
+                    break;
+            }
+        }
 
+        System.out.println(stats);
+    }
 }
 
 
