@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class HumanPlayer extends APlayer{
-
+ 
     HumanPlayer(Game game, char symbol){
         super(game,symbol);
     }

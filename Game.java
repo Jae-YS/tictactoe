@@ -8,6 +8,7 @@ public class Game{
     private char SYMBOL_BLANK = ' ';
     private char SYMBOL_1 = 'O';
     private char SYMBOL_2 = 'X';
+    int numberOfPlayer = 0;
 
     Game(){
         this.board = new char[3][3];
@@ -18,11 +19,11 @@ public class Game{
         }
     }
 
-    public int getBoardSize(){
-        return this.boardSize;
+    public void setNumberOfPlayer(int x){
+        this.numberOfPlayer = x;
     }
 
-    //check if the human move is valid
+    //check if the human/computer move is valid
     public boolean isValidMove(Move move){
         if (this.board[move.row][move.col] == ' ') return true;
         else return false;
@@ -32,28 +33,58 @@ public class Game{
 	    this.board[move.row][move.col] = symbol;
     }
 
-    public char getGameStatus(){
+    public char getGameStatus(char playerSymbol){
         /*
-         * return 'O' if you can still play the game
-         * return '1' if player 1 won
-         * return '2' if player 2 won
+         * return '0' if you can still play the game
+         * return 'O' if player 1 won
+         * return 'X' if player 2 won
          * return 'T' if the game is a tie
          * return 'Q' if user quits the game; 
          */
-        
-        //check vertical
-        for(int i=0;i<board.length;i++){
-            for(int y=0;y<board[i].length;y++){
 
+        //check vertical
+        int count = 0; 
+        for(int i=0;i<this.boardSize;i++){
+            for(int y=0;y<this.boardSize;y++){
+                if(board[i][y] == playerSymbol) count++;
             }
+            if(count == boardSize) return playerSymbol;
+            count = 0;
         }
-        
 
         //check horizontal
+        for(int i=0;i<this.boardSize;i++){
+            for(int y=0;y<this.boardSize;y++){
+                if(board[y][i] == playerSymbol) count++;
+            }
+            if(count == boardSize) return playerSymbol;
+            count = 0;
+        }
 
-        //check diagonal
+        //check diagonal left to right
+        for(int i = 0; i<this.boardSize; i++){
+            if(board[i][i] == playerSymbol) count++;
+        }
+        if(count == boardSize) return playerSymbol;
+        count = 0;
 
-        return '0';
+        //check diagonal right to left
+        for(int i = this.boardSize-1; i> -1 ; i--){
+            if(board[i][i] == playerSymbol) count++;
+        }
+        if(count == boardSize) return playerSymbol;
+        count = 0;
+
+        //check for full board
+        boolean fullBoard = true; 
+        for(int i=0;i<this.boardSize;i++){
+            for(int y=0;y<this.boardSize;y++){
+                if(board[i][y] == ' ') fullBoard = false;
+            }
+        }
+        if(fullBoard) return 'T'; 
+
+        return '0'; 
     }
 
     /*
@@ -102,17 +133,17 @@ public class Game{
 
     public char playGame(APlayer[] players){
         int whoPlays = 0;
-        char keepPlaying = ' '; 
-        while(true){
+        char keepPlaying = '0'; 
+        while(keepPlaying == '0'){
             if(whoPlays == 2) whoPlays = 0;
-            System.out.println(toString());
+            System.out.println("\n" + toString());
             Move nextMove = players[whoPlays].pickMove();
             if(nextMove == null) return 'Q';
             executeMove(nextMove, players[whoPlays].symbol);
-	        keepPlaying = this.getGameStatus(); 
-            if(keepPlaying != '0') break;
+	        keepPlaying = this.getGameStatus(players[whoPlays].getSymbol());
             whoPlays++; 
         }
+        System.out.println("\n" + toString());
         return keepPlaying;
     }
     public static void main(String args[]){
@@ -138,6 +169,7 @@ public class Game{
         APlayer p1;
         APlayer p2;
         GameStats stats;
+        gameboard.setNumberOfPlayer(option);
         if(option == 1 ){
             p1 = new HumanPlayer(gameboard, gameboard.SYMBOL_1);
             p2 = new CpuPlayer(gameboard, gameboard.SYMBOL_2);
@@ -146,7 +178,7 @@ public class Game{
         else{
             p1 = new HumanPlayer(gameboard, gameboard.SYMBOL_1);
             p2 = new HumanPlayer(gameboard, gameboard.SYMBOL_2);
-            stats = new GameStats(p1, p2);
+            stats = new GameStats2P(p1, p2);
         }
         int whoFirst = (int)(Math.random() * 1);
         if(whoFirst == 0){
@@ -164,16 +196,21 @@ public class Game{
         while(game){
             char result = gameboard.playGame(gameboard.players);
             switch(result){
-                case '1':
-                    if(gameboard.players[0] instanceof HumanPlayer && gameboard.players[1] instanceof HumanPlayer) stats.p1recordWin();
-                    //check to see if this works? else I need to have two separate methods to see if they are  p1 vs p2 or p1 vs cpu
-                    else stats.p1recordWin();
+                case 'O':
+                    gameboard.resetGame();
+                    if(gameboard.numberOfPlayer == 1) System.out.println("Player 1 won the round!");
+                    else System.out.println("Player 1 won the round. Player 2 lost the round.");
+                    stats.p1recordWin();
                     break;
-                case '2':
-                    if(gameboard.players[0] instanceof HumanPlayer && gameboard.players[1] instanceof HumanPlayer) stats.p1recordLoss();
-                    else stats.p1recordLoss();
+                case 'X':
+                    gameboard.resetGame();
+                    if(gameboard.numberOfPlayer == 1) System.out.println("CPU won the round!");
+                    else System.out.println("Player 2 won the round. Player l lost the round.");
+                    stats.p1recordLoss();
                     break;
                 case 'T':
+                    gameboard.resetGame();
+                    System.out.println("The round was a tie");
                     stats.recordTie();
                     break;
                 default: 
