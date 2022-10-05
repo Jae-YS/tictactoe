@@ -25,6 +25,9 @@ public class Game{
 
     //check if the human/computer move is valid
     public boolean isValidMove(Move move){
+        if (move.row == -1 || move.col == -1) return false;
+        
+    
         if (this.board[move.row][move.col] == ' ') return true;
         else return false;
     }
@@ -69,8 +72,10 @@ public class Game{
         count = 0;
 
         //check diagonal right to left
+        int j = 0;
         for(int i = this.boardSize-1; i> -1 ; i--){
-            if(board[i][i] == playerSymbol) count++;
+            if(board[j][i] == playerSymbol) count++;
+            j++;
         }
         if(count == boardSize) return playerSymbol;
         count = 0;
@@ -131,39 +136,33 @@ public class Game{
         return s += "\r\n";
     }
 
-    public APlayer[] switchOrder(APlayer[] players, int who){
+    public void switchOrder(APlayer[] players, Result result){
         APlayer store;
-        if(who == '1'){
-            store = players[1];
-            players[1] = players[0];
-            players[0] = store;
-        }
-        else{
+        if(result.getResult() == result.getFirst()){
             store = players[0];
-            players[0] = players[1];
+            players[0] = players[1]; 
             players[1] = store;
         }
-        return players; 
     }
 
-    public Result playGame(APlayer[] players){
+    public char playGame(APlayer[] players){
         int whoPlays = 0;
         char keepPlaying = '0'; 
-        Result result = new Result(0,' ');
         while(keepPlaying == '0'){
-            whoPlays++;
-            if(whoPlays == 3) whoPlays = 1;
+            if(whoPlays == 2) whoPlays = 0;
+            
             System.out.println("\n" + toString());
             Move nextMove = players[whoPlays].pickMove();
             if(nextMove == null){
-                result.setResult(-1, 'Q');
+                return 'Q';
             }
+
             executeMove(nextMove, players[whoPlays].symbol);
 	        keepPlaying = this.getGameStatus(players[whoPlays].getSymbol());
+            whoPlays++;
         }
         System.out.println("\n" + toString());
-        result.setResult(whoPlays, keepPlaying);
-        return result;
+        return keepPlaying;
     }
     public static void main(String args[]){
         Scanner sc  = new Scanner(System.in);
@@ -211,12 +210,13 @@ public class Game{
         }
     
         boolean game = true; 
+
         //running the game
-        Result result;
+        Result result = new Result(gameboard.players[0].getSymbol(), ' ');
         while(game){
-            result = gameboard.playGame(gameboard.players);
+            result.setResult(gameboard.players[0].getSymbol(), gameboard.playGame(gameboard.players));
             gameboard.resetGame();
-            gameboard.switchOrder(gameboard.players,result.who);
+            gameboard.switchOrder(gameboard.players,result);
             switch(result.winner){
                 case 'O':
                     if(gameboard.numberOfPlayer == 1) System.out.println("Player 1 won the round!");
@@ -228,12 +228,12 @@ public class Game{
                     else System.out.println("Player 2 won the round. Player l lost the round.");
                     stats.p1recordLoss();
                     break;
-                case 'T':
-                    System.out.println("The round was a tie");
-                    stats.recordTie();
+                case 'Q':
+                    game = false;
                     break;
                 default: 
-                    game = false;
+                    System.out.println("The round was a tie");
+                    stats.recordTie();
                     break;
             }
         }
@@ -241,11 +241,5 @@ public class Game{
         System.out.println(stats);
     }
 }
-
-/*
- * loser starts the next round
- * fix human player input, allows you to input number the n letter
- */
-
 
 

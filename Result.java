@@ -1,15 +1,23 @@
 public class Result {
-    int who; 
     char winner;
+    char whoFirst;
 
-    Result(int who, char winner){
-        this.who = who;
+    Result(char whoFirst, char winner){
+        this.winner = winner;
+        this.whoFirst = whoFirst;
+    }
+
+    void setResult(char whoFirst, char winner){
+        this.whoFirst = whoFirst;
         this.winner = winner;
     }
 
-    void setResult(int who, char winner){
-        this.who = who;
-        this.winner = winner;
+    char getFirst(){
+        return this.whoFirst;
+    }
+
+    char getResult(){
+        return this.winner; 
     }
 
 }
