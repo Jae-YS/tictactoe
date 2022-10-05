@@ -131,20 +131,39 @@ public class Game{
         return s += "\r\n";
     }
 
-    public char playGame(APlayer[] players){
+    public APlayer[] switchOrder(APlayer[] players, int who){
+        APlayer store;
+        if(who == '1'){
+            store = players[1];
+            players[1] = players[0];
+            players[0] = store;
+        }
+        else{
+            store = players[0];
+            players[0] = players[1];
+            players[1] = store;
+        }
+        return players; 
+    }
+
+    public Result playGame(APlayer[] players){
         int whoPlays = 0;
         char keepPlaying = '0'; 
+        Result result = new Result(0,' ');
         while(keepPlaying == '0'){
-            if(whoPlays == 2) whoPlays = 0;
+            whoPlays++;
+            if(whoPlays == 3) whoPlays = 1;
             System.out.println("\n" + toString());
             Move nextMove = players[whoPlays].pickMove();
-            if(nextMove == null) return 'Q';
+            if(nextMove == null){
+                result.setResult(-1, 'Q');
+            }
             executeMove(nextMove, players[whoPlays].symbol);
 	        keepPlaying = this.getGameStatus(players[whoPlays].getSymbol());
-            whoPlays++; 
         }
         System.out.println("\n" + toString());
-        return keepPlaying;
+        result.setResult(whoPlays, keepPlaying);
+        return result;
     }
     public static void main(String args[]){
         Scanner sc  = new Scanner(System.in);
@@ -193,23 +212,23 @@ public class Game{
     
         boolean game = true; 
         //running the game
+        Result result;
         while(game){
-            char result = gameboard.playGame(gameboard.players);
-            switch(result){
+            result = gameboard.playGame(gameboard.players);
+            gameboard.resetGame();
+            gameboard.switchOrder(gameboard.players,result.who);
+            switch(result.winner){
                 case 'O':
-                    gameboard.resetGame();
                     if(gameboard.numberOfPlayer == 1) System.out.println("Player 1 won the round!");
                     else System.out.println("Player 1 won the round. Player 2 lost the round.");
                     stats.p1recordWin();
                     break;
                 case 'X':
-                    gameboard.resetGame();
                     if(gameboard.numberOfPlayer == 1) System.out.println("CPU won the round!");
                     else System.out.println("Player 2 won the round. Player l lost the round.");
                     stats.p1recordLoss();
                     break;
                 case 'T':
-                    gameboard.resetGame();
                     System.out.println("The round was a tie");
                     stats.recordTie();
                     break;
@@ -222,6 +241,11 @@ public class Game{
         System.out.println(stats);
     }
 }
+
+/*
+ * loser starts the next round
+ * fix human player input, allows you to input number the n letter
+ */
 
 
 

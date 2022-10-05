@@ -5,7 +5,7 @@ public abstract class APlayer{
     APlayer(){}
     APlayer(Game game, char symbol){
         this.game = game;
-        this.symbol = symbol;
+        this.symbol = symbol;  
     }
 
     public char getSymbol(){
